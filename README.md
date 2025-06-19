@@ -299,7 +299,7 @@ npm run preview
 ## Demo & Screenshots
 
 ### Live Demo
-**Deployed Application**: [https://creditwise-ai.vercel.app](https://creditwise-ai.vercel.app)
+**Deployed Application**: [https://creditwise.heyadrsh.tech](https://creditwise.heyadrsh.tech)
 
 ### Core Features Demonstration
 
