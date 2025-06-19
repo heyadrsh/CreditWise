@@ -153,6 +153,7 @@ export default function SpendingSimulator({ onNavigate }: SpendingSimulatorProps
                         onKeyPress={(e) => handleKeyPress(category as keyof SpendingProfile, e)}
                         onBlur={() => handleInputSubmit(category as keyof SpendingProfile)}
                         className="w-full sm:w-32 lg:w-36 px-3 sm:px-4 py-2 sm:py-3 text-base sm:text-lg font-bold text-primary bg-primary/5 border-2 border-primary/20 rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary focus:bg-primary/10 hover:border-primary/40 hover:bg-primary/8 transition-all duration-200 font-times text-center placeholder-primary/60"
+                        style={{ fontSize: '16px' }}
                       />
                       {!inputValues[category] && (
                         <div className="absolute inset-0 flex items-center justify-center pointer-events-none text-base sm:text-lg font-bold text-primary bg-primary/5 rounded-lg border-2 border-primary/20">

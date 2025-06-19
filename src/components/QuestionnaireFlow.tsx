@@ -890,9 +890,15 @@ ${!(updatedProfile.dining || updatedProfile.groceries || updatedProfile.shopping
 - STRUCTURED RESPONSES: Use proper markdown formatting with headers, bullets, and emphasis
 - PROFESSIONAL TONE: Always end with a question to keep conversation flowing
 
-⚠️ CRITICAL: NEVER RECOMMEND CARDS WITHOUT ALL REQUIRED INFORMATION!
-TRIGGER ANALYSIS ONLY WHEN: name + income + (creditScore OR age) + benefits are ALL collected
-COMPLETION PHRASE: "Perfect! I have everything I need, [Name]. Let me analyze the best credit cards for your profile... Would you like to see my personalized recommendations?"
+🚨 CRITICAL RULES - NEVER BREAK THESE:
+============================================
+❌ NEVER MENTION SPECIFIC CARD NAMES until you have ALL 4 required pieces of information!
+❌ NEVER say "recommend", "suggest", or mention card benefits until data is complete!
+❌ NEVER give any card advice or analysis without: name + income + (creditScore OR age) + benefits!
+❌ If user asks for recommendations early, say: "I need a bit more information first..."
+
+✅ ONLY AFTER collecting ALL 4 pieces: name + income + (creditScore OR age) + benefits
+✅ COMPLETION PHRASE: "Perfect! I have everything I need, [Name]. Let me analyze the best credit cards for your profile..."
 
 RESPONSE FORMATTING RULES:
 - Use **bold** for important points
@@ -1719,7 +1725,23 @@ I suggest you compare these cards further to find the best fit for your needs. *
       }
 
       const aiResponse = await processNaturalLanguage(currentInput);
-      const { cleanResponse, cardWidgets } = parseForMultipleCards(aiResponse.response);
+      
+      // Use the already updated profile from processNaturalLanguage
+      const finalProfile = { ...userProfile, ...aiResponse.extractedData };
+      
+      // Enhanced completion detection
+      const hasComprehensiveData = checkDataCompleteness(finalProfile);
+      
+      // ONLY parse for cards if we have complete data OR it's an explicit recommendation trigger
+      let cleanResponse = aiResponse.response;
+      let cardWidgets: ChatMessage[] = [];
+      
+      if (hasComprehensiveData || aiResponse.shouldComplete) {
+        // Only now parse for card widgets if data is complete
+        const parseResult = parseForMultipleCards(aiResponse.response);
+        cleanResponse = parseResult.cleanResponse;
+        cardWidgets = parseResult.cardWidgets;
+      }
 
       // Add text response if substantial
       if (cleanResponse && cleanResponse.length > 10) {
@@ -1732,8 +1754,8 @@ I suggest you compare these cards further to find the best fit for your needs. *
       setChatMessages(prev => [...prev, aiMessage]);
       }
 
-      // Add card widgets with staggered animation (up to 3 cards)
-      if (cardWidgets.length > 0) {
+      // Add card widgets with staggered animation (up to 3 cards) - ONLY if data complete
+      if (cardWidgets.length > 0 && (hasComprehensiveData || aiResponse.shouldComplete)) {
         setTimeout(() => {
           cardWidgets.forEach((widget, index) => {
             setTimeout(() => {
@@ -1752,59 +1774,38 @@ I suggest you compare these cards further to find the best fit for your needs. *
         }, 500);
       }
 
-      // Use the already updated profile from processNaturalLanguage
-      const finalProfile = { ...userProfile, ...aiResponse.extractedData };
-      
-      // Enhanced completion detection
-      const hasComprehensiveData = checkDataCompleteness(finalProfile);
-      
-      // Manual trigger check - if user says "yes" or "sure" and we have basic data
+      // STRICT: Only allow manual trigger if user explicitly says "yes" AND has complete data
       const isManualTrigger = (
         (currentInput.toLowerCase().includes('yes') || 
          currentInput.toLowerCase().includes('sure') || 
          currentInput.toLowerCase().includes('proceed')) &&
-        finalProfile.name && finalProfile.income
+        hasComprehensiveData // Must have ALL data, not just basic
       );
       
-      // Comprehensive input detection - if user provides lots of info in one message
+      // STRICT: Only allow comprehensive input if user provides complete data in one go
       const isComprehensiveInput = (
         Object.keys(aiResponse.extractedData || {}).length >= 4 && // Extracted at least 4 pieces of data
-        finalProfile.name && 
-        finalProfile.income &&
-        (finalProfile.creditScore || finalProfile.age)
+        hasComprehensiveData // Must pass the strict completion check
       );
       
-      // Force trigger if AI is giving placeholder recommendations OR saying it has enough info
-      const isGivingPlaceholders = (
-        aiResponse.response.includes('[Credit Card Name') ||
-        aiResponse.response.includes('* [Credit Card') ||
-        aiResponse.response.includes('Card Name 1') ||
-        aiResponse.response.includes('Card Name 2') ||
-        (aiResponse.response.includes('card') && aiResponse.response.includes('recommend') && 
-         finalProfile.name && finalProfile.income && (finalProfile.creditScore || finalProfile.age))
-      );
-
-      // Force trigger if AI says it has enough info to analyze
+      // STRICT: Only trigger if AI explicitly says it has EVERYTHING and completion phrase is used
       const isReadyToAnalyze = (
-        (aiResponse.response.includes('Perfect! I have enough info') || 
-         aiResponse.response.includes('Analyzing cards for you') ||
-         aiResponse.response.includes('analyzing cards') ||
-         aiResponse.response.includes('I have enough')) &&
-        finalProfile.name && finalProfile.income && (finalProfile.creditScore || finalProfile.age)
+        (aiResponse.response.includes('Perfect! I have everything I need') || 
+         aiResponse.response.includes('analyze the best credit cards for your profile')) &&
+        hasComprehensiveData // Must have all required data
       );
       
       console.log('🔍 Completion Analysis:', {
         hasComprehensiveData,
         isManualTrigger,
         isComprehensiveInput,
-        isGivingPlaceholders,
         isReadyToAnalyze,
         extractedKeys: Object.keys(aiResponse.extractedData || {}),
         extractedCount: Object.keys(aiResponse.extractedData || {}).length,
         aiResponse: aiResponse.response.substring(0, 100) + '...'
       });
       
-      if (aiResponse.shouldComplete || isManualTrigger || isComprehensiveInput || isGivingPlaceholders || isReadyToAnalyze) {
+      if (aiResponse.shouldComplete || isManualTrigger || isComprehensiveInput || isReadyToAnalyze) {
         console.log('🚀 Triggering recommendations with profile:', finalProfile);
         
         const analysisMessage: ChatMessage = {
@@ -1853,51 +1854,60 @@ I suggest you compare these cards further to find the best fit for your needs. *
       <div className="min-h-screen bg-background font-times">
         <div className="
           max-w-4xl mx-auto 
-          p-3
-          sm:p-4
+          p-2
+          sm:p-3
+          md:p-4
           lg:p-6
         ">
           <div className="bg-background-card rounded-lg shadow-times-lg border border-border relative">
             {/* Times Internet Chat Header - Mobile First */}
             <div className="
-              flex flex-col gap-4
+              flex flex-col gap-3
               sm:flex-row sm:items-center sm:justify-between 
-              p-4
+              p-3
+              sm:p-4
+              md:p-5
               lg:p-6 
               border-b border-border
             ">
-              <div className="flex items-center space-x-3 lg:space-x-4">
+              <div className="flex items-center space-x-2 sm:space-x-3 lg:space-x-4">
                 <div className="
-                  w-10 h-10
+                  w-8 h-8
+                  sm:w-10 sm:h-10
+                  md:w-11 md:h-11
                   lg:w-12 lg:h-12 
                   bg-primary rounded-lg flex items-center justify-center shadow-times
                 ">
-                  <span className="material-symbols-outlined text-white text-lg lg:text-xl">smart_toy</span>
+                  <span className="material-symbols-outlined text-white text-sm sm:text-lg lg:text-xl">smart_toy</span>
                 </div>
                 <div>
                   <h2 className="
-                    text-lg 
+                    text-base
+                    sm:text-lg 
+                    md:text-xl
                     lg:text-xl 
                     font-semibold text-text-primary font-times
-                  ">CreditWise</h2>
+                  ">CreditWise AI</h2>
                   <p className="
                     text-xs
+                    sm:text-xs
+                    md:text-sm
                     lg:text-sm 
                     text-text-secondary font-times
                   ">Tell me about your spending habits naturally</p>
                 </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 w-full sm:w-auto">
                 <button
                   onClick={() => setShowChat(false)}
-                  className="times-btn-outline font-times text-sm lg:text-base"
+                  className="times-btn-outline font-times text-xs sm:text-sm lg:text-base flex-1 sm:flex-none"
                 >
                   <span className="hidden sm:inline">Switch to Guided Questions</span>
                   <span className="sm:hidden">Guided</span>
                 </button>
                 <button
                   onClick={() => onNavigate('home')}
-                  className="times-btn-outline font-times text-sm lg:text-base"
+                  className="times-btn-outline font-times text-xs sm:text-sm lg:text-base flex-1 sm:flex-none"
                 >
                   <span className="hidden sm:inline">← Back to Home</span>
                   <span className="sm:hidden">← Back</span>
@@ -1905,22 +1915,22 @@ I suggest you compare these cards further to find the best fit for your needs. *
               </div>
             </div>
 
-            {/* Modern Chat Messages */}
+            {/* Modern Chat Messages - Mobile Responsive */}
             <div 
               ref={chatMessagesRef}
               style={{
-                height: '600px',
+                height: '450px',
                 overflowY: 'auto',
-                padding: '24px',
+                padding: '16px',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '16px',
+                gap: '12px',
                 scrollBehavior: 'smooth',
                 border: '1px solid #f0f0f0',
                 borderRadius: '8px',
                 background: '#fafafa'
               }}
-              className="chat-messages"
+              className="chat-messages sm:h-[500px] md:h-[550px] lg:h-[600px] sm:p-5 md:p-6 lg:p-6 sm:gap-4 lg:gap-4"
               onScroll={handleScroll}
             >
               {chatMessages.map((message) => (
@@ -1933,22 +1943,23 @@ I suggest you compare these cards further to find the best fit for your needs. *
                     animation: 'messageSlide 0.3s ease-out'
                   }}
                 >
-                  <div style={{ maxWidth: message.cardWidget ? '90%' : '70%' }}>
+                  <div style={{ maxWidth: message.cardWidget ? '95%' : '85%' }} className="sm:max-w-[90%] md:max-w-[85%] lg:max-w-[70%]">
                     {message.cardWidget ? (
                       // Card widget message
                       <div className="space-y-3">
                         {message.content && (
                   <div
                     style={{
-                              padding: '12px 16px',
-                              borderRadius: '18px',
-                              fontSize: '15px',
+                              padding: '10px 12px',
+                              borderRadius: '16px',
+                              fontSize: '14px',
                               lineHeight: '1.4',
                               wordWrap: 'break-word',
                               background: '#f1f3f4',
                               color: '#333',
                               borderBottomLeftRadius: '4px'
                             }}
+                            className="sm:p-3 sm:text-base sm:rounded-lg md:p-4 md:text-base lg:p-4 lg:text-base"
                           >
                             <ReactMarkdown remarkPlugins={[remarkGfm]}>
                               {message.content}
@@ -1961,10 +1972,12 @@ I suggest you compare these cards further to find the best fit for your needs. *
                           reasons={message.cardWidget.reasons}
                         />
                         <p style={{
-                          fontSize: '11px',
+                          fontSize: '10px',
                           color: '#718096',
-                          marginLeft: '16px'
-                        }}>
+                          marginLeft: '12px'
+                        }}
+                        className="sm:text-xs sm:ml-4 lg:text-xs lg:ml-4"
+                        >
                           {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </p>
                       </div>
@@ -1972,16 +1985,17 @@ I suggest you compare these cards further to find the best fit for your needs. *
                       // Regular text message
                       <div
                         style={{
-                      padding: '12px 16px',
-                      borderRadius: '18px',
-                      fontSize: '15px',
+                      padding: '10px 12px',
+                      borderRadius: '16px',
+                      fontSize: '14px',
                       lineHeight: '1.4',
                       wordWrap: 'break-word',
                       background: message.type === 'user' ? '#007bff' : '#f1f3f4',
                       color: message.type === 'user' ? '#ffffff' : '#333',
-                      borderBottomLeftRadius: message.type === 'ai' ? '4px' : '18px',
-                      borderBottomRightRadius: message.type === 'user' ? '4px' : '18px'
+                      borderBottomLeftRadius: message.type === 'ai' ? '4px' : '16px',
+                      borderBottomRightRadius: message.type === 'user' ? '4px' : '16px'
                     }}
+                    className="sm:p-3 sm:text-base sm:rounded-lg md:p-4 md:text-base lg:p-4 lg:text-base"
                   >
                         {message.type === 'ai' ? (
                           <ReactMarkdown remarkPlugins={[remarkGfm]}>
@@ -1991,12 +2005,14 @@ I suggest you compare these cards further to find the best fit for your needs. *
                     <p style={{ margin: 0, whiteSpace: 'pre-line', color: message.type === 'user' ? '#ffffff' : '#333' }}>{message.content}</p>
                         )}
                     <p style={{
-                      fontSize: '11px',
+                      fontSize: '10px',
                       opacity: 0.8,
                       marginTop: '4px',
                           margin: '4px 0 0 0',
                           color: message.type === 'user' ? '#ffffff' : '#718096'
-                    }}>
+                    }}
+                    className="sm:text-xs lg:text-xs"
+                    >
                       {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </p>
                       </div>
@@ -2005,20 +2021,20 @@ I suggest you compare these cards further to find the best fit for your needs. *
                 </div>
               ))}
               
-              {/* AI Analysis Loading Animation */}
+              {/* AI Analysis Loading Animation - Mobile Responsive */}
               {isAnalyzing && (
                 <div className="flex justify-start">
-                  <div className="bg-background-card border border-border text-text-primary px-4 py-3 rounded-lg shadow-times max-w-xs">
-                    <div className="flex items-center space-x-3">
+                  <div className="bg-background-card border border-border text-text-primary px-3 py-2 sm:px-4 sm:py-3 rounded-lg shadow-times max-w-xs sm:max-w-sm">
+                    <div className="flex items-center space-x-2 sm:space-x-3">
                       <div className="flex space-x-1">
-                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
-                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full animate-bounce"></div>
+                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm font-times font-semibold">Analyzing credit cards...</p>
-                        <div className="w-full bg-border rounded-full h-1 mt-2">
-                          <div className="bg-primary h-1 rounded-full animate-pulse" style={{ width: '75%' }}></div>
+                        <p className="text-xs sm:text-sm font-times font-semibold">Analyzing credit cards...</p>
+                        <div className="w-full bg-border rounded-full h-0.5 sm:h-1 mt-1 sm:mt-2">
+                          <div className="bg-primary h-0.5 sm:h-1 rounded-full animate-pulse" style={{ width: '75%' }}></div>
                         </div>
                       </div>
                     </div>
@@ -2031,27 +2047,30 @@ I suggest you compare these cards further to find the best fit for your needs. *
                   <div style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '8px',
-                    padding: '12px 16px',
+                    gap: '6px',
+                    padding: '10px 12px',
                     background: '#f1f3f4',
-                    borderRadius: '18px',
+                    borderRadius: '16px',
                     borderBottomLeftRadius: '4px',
-                    maxWidth: '70%',
-                    marginBottom: '16px'
-                  }}>
-                    <span style={{ fontSize: '14px', color: '#718096' }}>AI is typing</span>
-                    <div style={{ display: 'flex', gap: '4px' }}>
+                    maxWidth: '85%',
+                    marginBottom: '12px'
+                  }}
+                  className="sm:gap-2 sm:p-3 sm:rounded-lg sm:max-w-[70%] sm:mb-4 lg:gap-2 lg:p-4 lg:max-w-[70%] lg:mb-4"
+                  >
+                    <span style={{ fontSize: '12px', color: '#718096' }} className="sm:text-sm lg:text-sm">AI is typing</span>
+                    <div style={{ display: 'flex', gap: '3px' }} className="sm:gap-1 lg:gap-1">
                       {[0, 1, 2].map((i) => (
                         <div
                           key={i}
                           style={{
-                            width: '8px',
-                            height: '8px',
+                            width: '6px',
+                            height: '6px',
                             background: '#9ca3af',
                             borderRadius: '50%',
                             animation: `typingPulse 1.4s infinite`,
                             animationDelay: `${i * 0.2}s`
                           }}
+                          className="sm:w-2 sm:h-2 lg:w-2 lg:h-2"
                         />
                       ))}
                     </div>
@@ -2060,15 +2079,16 @@ I suggest you compare these cards further to find the best fit for your needs. *
               )}
             </div>
 
-            {/* Scroll to Bottom Button */}
+            {/* Scroll to Bottom Button - Mobile Responsive */}
             {showScrollButton && (
               <div
                 style={{
                   position: 'absolute',
-                  bottom: '80px',
-                  right: '32px',
+                  bottom: '70px',
+                  right: '16px',
                   zIndex: 10
                 }}
+                className="sm:bottom-20 sm:right-8 lg:bottom-20 lg:right-8"
               >
                 <button
                   onClick={scrollToBottom}
@@ -2076,8 +2096,8 @@ I suggest you compare these cards further to find the best fit for your needs. *
                     background: '#007bff',
                     border: 'none',
                     borderRadius: '50%',
-                    width: '40px',
-                    height: '40px',
+                    width: '36px',
+                    height: '36px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -2087,6 +2107,7 @@ I suggest you compare these cards further to find the best fit for your needs. *
                     transition: 'all 0.2s ease',
                     animation: 'fadeInUp 0.3s ease-out'
                   }}
+                  className="sm:w-10 sm:h-10 lg:w-10 lg:h-10"
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'scale(1.1)';
                     e.currentTarget.style.background = '#0056b3';
@@ -2097,22 +2118,23 @@ I suggest you compare these cards further to find the best fit for your needs. *
                   }}
                   title="Scroll to bottom"
                 >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="sm:w-5 sm:h-5 lg:w-5 lg:h-5">
                     <path d="M12 16L6 10L7.41 8.59L12 13.17L16.59 8.59L18 10L12 16Z" fill="currentColor"/>
                   </svg>
                 </button>
               </div>
             )}
 
-            {/* Modern Chat Input */}
+            {/* Modern Chat Input - Mobile Responsive */}
             <div 
               style={{
                 background: 'white',
                 borderTop: '1px solid #e5e5e5',
-                padding: '16px 24px 24px',
+                padding: '12px 16px 16px',
                 position: 'sticky',
                 bottom: 0
               }}
+              className="sm:p-4 sm:pb-5 md:p-5 md:pb-6 lg:p-6 lg:pb-6"
             >
               <form onSubmit={handleChatSubmit}>
                 <div 
@@ -2121,12 +2143,13 @@ I suggest you compare these cards further to find the best fit for your needs. *
                     alignItems: 'center',
                     background: 'white',
                     border: '2px solid #e5e5e5',
-                    borderRadius: '24px',
-                    padding: '8px 12px',
+                    borderRadius: '20px',
+                    padding: '6px 10px',
                     transition: 'all 0.2s ease',
                     position: 'relative',
                     maxWidth: '100%'
                   }}
+                  className="chat-input-wrapper sm:rounded-3xl sm:p-2 md:p-3 lg:p-3"
                   onFocus={() => {
                     const wrapper = document.querySelector('.chat-input-wrapper') as HTMLElement;
                     if (wrapper) {
@@ -2141,7 +2164,6 @@ I suggest you compare these cards further to find the best fit for your needs. *
                       wrapper.style.boxShadow = 'none';
                     }
                   }}
-                  className="chat-input-wrapper"
                 >
                   <input
                     ref={chatInputRef}
@@ -2155,11 +2177,12 @@ I suggest you compare these cards further to find the best fit for your needs. *
                       border: 'none',
                       outline: 'none',
                       fontSize: '16px',
-                      padding: '12px 16px',
+                      padding: '10px 12px',
                       background: 'transparent',
                       color: '#333',
-                      minHeight: '24px'
+                      minHeight: '20px'
                     }}
+                    className="sm:text-base sm:p-3 md:text-base md:p-4 lg:text-base lg:p-4 sm:min-h-[24px] lg:min-h-[24px]"
                     onBlur={(e) => {
                       // Only refocus if the blur was caused by clicking within the chat area
                       if (showChat && !isProcessingChat && e.relatedTarget) {
@@ -2188,17 +2211,18 @@ I suggest you compare these cards further to find the best fit for your needs. *
                       background: !chatInput.trim() || isProcessingChat ? '#9ca3af' : '#007bff',
                       border: 'none',
                       borderRadius: '50%',
-                      width: '40px',
-                      height: '40px',
+                      width: '36px',
+                      height: '36px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       cursor: !chatInput.trim() || isProcessingChat ? 'not-allowed' : 'pointer',
                       transition: 'all 0.2s ease',
                       color: 'white',
-                      marginLeft: '8px',
+                      marginLeft: '6px',
                       flexShrink: 0
                     }}
+                    className="sm:w-10 sm:h-10 sm:ml-2 md:w-10 md:h-10 lg:w-10 lg:h-10 lg:ml-2"
                     onMouseEnter={(e) => {
                       if (!isProcessingChat && chatInput.trim()) {
                         e.currentTarget.style.background = '#0056b3';
@@ -2222,7 +2246,7 @@ I suggest you compare these cards further to find the best fit for your needs. *
                       }
                     }}
                   >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="sm:w-5 sm:h-5 lg:w-5 lg:h-5">
                       <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" fill="currentColor"/>
                     </svg>
                   </button>
@@ -2230,15 +2254,17 @@ I suggest you compare these cards further to find the best fit for your needs. *
               </form>
               <p 
                 style={{
-                  fontSize: '12px',
+                  fontSize: '11px',
                   color: '#718096',
-                  marginTop: '8px',
+                  marginTop: '6px',
                   textAlign: 'center'
                 }}
+                className="sm:text-xs sm:mt-2 lg:text-xs lg:mt-2"
               >
-                Example: "I earn ₹80,000 per month, spend mostly on dining and fuel"
-                <br />
-                <span style={{ fontSize: '11px', opacity: 0.7 }}>
+                <span className="hidden sm:inline">Example: "I earn ₹80,000 per month, spend mostly on dining and fuel"</span>
+                <span className="sm:hidden">Example: "I earn ₹80k, spend on dining"</span>
+                <br className="hidden sm:block" />
+                <span style={{ fontSize: '10px', opacity: 0.7 }} className="sm:text-xs lg:text-xs hidden sm:inline">
                   💡 Press Ctrl+/ (Cmd+/) to focus input anytime
                 </span>
               </p>
@@ -2371,19 +2397,51 @@ I suggest you compare these cards further to find the best fit for your needs. *
           font-weight: 600;
         }
 
-        /* Mobile responsive */
-        @media (max-width: 768px) {
+        /* Mobile responsive adjustments */
+        @media (max-width: 640px) {
           .chat-messages {
-            padding: 16px 20px !important;
+            height: 450px !important;
+            padding: 16px !important;
+            gap: 12px !important;
           }
           
           .chat-input-wrapper {
+            border-radius: 20px !important;
             padding: 6px 10px !important;
           }
 
           .card-widget {
             max-width: 100% !important;
             margin: 8px 0 !important;
+          }
+          
+          /* Tighter spacing for mobile */
+          .card-widget .grid {
+            gap: 8px !important;
+          }
+          
+          .card-widget .p-3 {
+            padding: 12px !important;
+          }
+          
+          .card-widget .text-xs {
+            font-size: 11px !important;
+          }
+        }
+
+        /* Tablet responsive */
+        @media (min-width: 641px) and (max-width: 1024px) {
+          .chat-messages {
+            height: 500px !important;
+            padding: 20px !important;
+          }
+        }
+
+        /* Desktop responsive */
+        @media (min-width: 1025px) {
+          .chat-messages {
+            height: 600px !important;
+            padding: 24px !important;
           }
         }
       `}</style>
