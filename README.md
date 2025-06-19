@@ -44,8 +44,8 @@ This prototype demonstrates the feasibility of using AI agents for financial adv
 - **Real-time Data Management**: Admin interface for database updates and maintenance
 - **Structured Data Model**: Normalized schema supporting complex queries and filtering
 
-![Database Management Flow](images/database-management.svg)
-*Supabase database structure and management workflow*
+![Database Management Flow](images/database_overview.png)
+*Supabase database structure showing credit cards table*
 
 ### Intelligent Recommendation Engine
 - **Multi-Factor Scoring**: Advanced algorithm considering income, spending patterns, and preferences
@@ -53,7 +53,7 @@ This prototype demonstrates the feasibility of using AI agents for financial adv
 - **Reward Simulation**: Projected annual earnings based on user spending patterns
 - **Eligibility Filtering**: Automatic filtering based on income and credit requirements
 
-![Recommendation Engine](images/recommendation.svg)
+![Recommendation Engine](images/ai_recommendation.gif)
 *Real-time recommendation generation and scoring algorithm*
 
 ### Professional Web Interface
@@ -83,7 +83,7 @@ This prototype demonstrates the feasibility of using AI agents for financial adv
 [Google Gemini AI] → [Recommendation Engine] → [Scoring Algorithm]
 ```
 
-![System Architecture](images/aiflow.svg)
+![System Architecture](images/dekstop_overview.gif)
 *Complete system architecture and AI agent data flow*
 
 ### Agent Framework Design
@@ -147,7 +147,7 @@ CREATE TABLE credit_cards (
 );
 ```
 
-![Database Schema](images/database-management.svg)
+![Database Schema](images/database_overview.png)
 *Complete database schema and relationships in Supabase*
 
 ## AI Agent Flow
@@ -272,7 +272,7 @@ The system prompt dynamically incorporates:
 - **Intelligent questioning strategy** with personalization
 - **Professional formatting** with structured markdown responses
 
-![Agent Flow Chart](images/agentflowchart.svg)
+![Agent Flow Chart](images/ai_recommendation.gif)
 *Detailed AI agent conversation flow and decision points*
 
 ## Setup Instructions
