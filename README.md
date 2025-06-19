@@ -35,8 +35,8 @@ This prototype demonstrates the feasibility of using AI agents for financial adv
 - **Context Awareness**: Maintains conversation history and user profile throughout the session
 - **Profile Extraction**: Automatically extracts key financial information from natural language
 
-![AI Chat Flow](images/aiflow.svg)
-*AI agent conducting personalized Q&A session with intelligent data collection*
+![AI Chat Flow](images/ai_recommendation.gif)
+*AI agent conducting personalized Q&A session with real-time recommendations*
 
 ### Comprehensive Card Database
 - **20+ Indian Credit Cards**: Curated dataset with major issuers (HDFC, SBI, ICICI, Axis, etc.)
@@ -45,7 +45,7 @@ This prototype demonstrates the feasibility of using AI agents for financial adv
 - **Structured Data Model**: Normalized schema supporting complex queries and filtering
 
 ![Database Management Flow](images/database-management.svg)
-*Supabase database structure and management workflow with real-time synchronization*
+*Supabase database structure and management workflow*
 
 ### Intelligent Recommendation Engine
 - **Multi-Factor Scoring**: Advanced algorithm considering income, spending patterns, and preferences
@@ -54,7 +54,7 @@ This prototype demonstrates the feasibility of using AI agents for financial adv
 - **Eligibility Filtering**: Automatic filtering based on income and credit requirements
 
 ![Recommendation Engine](images/recommendation.svg)
-*Real-time recommendation generation and scoring with advanced AI algorithms*
+*Real-time recommendation generation and scoring algorithm*
 
 ### Professional Web Interface
 - **Mobile-Responsive Design**: Optimized for all device types and screen sizes
@@ -63,7 +63,7 @@ This prototype demonstrates the feasibility of using AI agents for financial adv
 - **Modern UI/UX**: Professional design following Times Internet corporate standards
 
 ![Main Interface](images/dekstop_overview.gif)
-*Complete user journey from chat to recommendations on desktop interface*
+*Complete user journey from chat to recommendations on desktop*
 
 ### Administrative Dashboard
 - **Full CRUD Operations**: Complete card database management capabilities
@@ -72,7 +72,7 @@ This prototype demonstrates the feasibility of using AI agents for financial adv
 - **Secure Authentication**: Role-based access control with Supabase Auth
 
 ![Admin Interface Flow](images/admin-panel.gif)
-*Admin panel workflow and database management capabilities with real-time updates*
+*Admin panel workflow and database management capabilities*
 
 ## Architecture
 
@@ -83,17 +83,8 @@ This prototype demonstrates the feasibility of using AI agents for financial adv
 [Google Gemini AI] → [Recommendation Engine] → [Scoring Algorithm]
 ```
 
-### System Architecture Overview
-```
-Frontend (React + TypeScript + Tailwind)
-    ↓
-Supabase Backend (PostgreSQL + Auth + Real-time)
-    ↓
-Google Gemini AI (Natural Language Processing)
-    ↓
-Recommendation Engine (Multi-factor Scoring)
-```
-*Complete system architecture with modern tech stack integration*
+![System Architecture](images/aiflow.svg)
+*Complete system architecture and AI agent data flow*
 
 ### Agent Framework Design
 The conversational agent follows a structured approach:
@@ -156,14 +147,8 @@ CREATE TABLE credit_cards (
 );
 ```
 
-### Database Schema Overview
-The credit_cards table serves as the central data structure with comprehensive card information, optimized indexes for performance, and Row Level Security for data protection.
-
-**Key Relationships:**
-- Primary Key: `id` (UUID)
-- Performance Indexes: issuer, category, income, network
-- Security: RLS policies for admin/public access
-- Real-time: Supabase subscriptions for live updates
+![Database Schema](images/database-management.svg)
+*Complete database schema and relationships in Supabase*
 
 ## AI Agent Flow
 
@@ -288,7 +273,7 @@ The system prompt dynamically incorporates:
 - **Professional formatting** with structured markdown responses
 
 ![Agent Flow Chart](images/agentflowchart.svg)
-*Detailed AI agent conversation flow and decision points with validation logic*
+*Detailed AI agent conversation flow and decision points*
 
 ## Setup Instructions
 
@@ -345,19 +330,19 @@ npm run preview
 
 #### AI-Powered Conversation
 ![AI Chat Demo](images/ai_recommendation.gif)
-*Complete AI conversation from start to recommendations with personalized analysis*
+*Complete AI conversation from start to recommendations*
 
 #### Spending Calculator
 ![Calculator Demo](images/rewards_calculator.gif)
-*Interactive spending simulator with real-time reward calculations and comparisons*
+*Interactive spending simulator with real-time calculations*
 
 #### Card Comparison
 ![Comparison Demo](images/all_cards.gif)
-*Side-by-side card comparison functionality with detailed feature breakdown*
+*Side-by-side card comparison and browsing functionality*
 
 #### Mobile Experience
 ![Mobile Demo](images/mobile_overview.gif)
-*Responsive design optimized for mobile devices with touch-friendly interactions*
+*Responsive design across different device sizes*
 
 ## API Documentation
 
@@ -415,17 +400,8 @@ Login → Dashboard → Card Management → Create/Edit/Delete →
 Statistics Review → Data Export → Logout
 ```
 
-### Admin Workflow Overview
-```
-Admin Authentication → Dashboard Access → Card Management Operations
-    ↓
-CRUD Operations (Create/Read/Update/Delete)
-    ↓
-Real-time Database Sync → User Interface Updates
-    ↓
-Statistics & Analytics Dashboard
-```
-*Complete administrative interface with secure access control and real-time capabilities*
+![Admin Workflow](images/admin-panel.gif)
+*Complete administrative interface and capabilities*
 
 ## Deployment
 
