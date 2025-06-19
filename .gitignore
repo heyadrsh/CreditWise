@@ -85,9 +85,9 @@ $RECYCLE.BIN/
 # Help resources directory (large files)
 help-resources/
 
-# Legacy components (if not needed)
-components/
-app/
+# Legacy components (if not needed) - root level only
+/components/
+/app/
 
 # Keep package-lock.json for Vercel deployment consistency
 # package-lock.json
