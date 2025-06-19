@@ -416,7 +416,9 @@ export default function RecommendationsPage({ userProfile, onNavigate, onCompare
         spending_categories: responses.spending_categories || [],
         monthly_spending: responses.monthly_spending || 25000,
         card_preferences: responses.card_preferences || [],
-        credit_history: responses.credit_history || 'fair'
+        credit_history: responses.credit_history || 'fair',
+        age: responses.age || 25,
+        creditScore: responses.creditScore || 650
       };
       
       console.log('👤 User profile from questionnaire:', profile);
@@ -486,28 +488,38 @@ export default function RecommendationsPage({ userProfile, onNavigate, onCompare
           reasons.push(`Premium benefits justify the ₹${annualFee} annual fee`);
         }
 
-        // 4. Income optimization (15 points max)
+        // 4. Income optimization (10 points max)
         const incomeRatio = profile.income / (card.min_income || 1);
         if (incomeRatio >= 3) {
-          totalScore += 15;
+          totalScore += 10;
           reasons.push(`Well above minimum income - guaranteed approval`);
         } else if (incomeRatio >= 1.5) {
-          totalScore += 10;
+          totalScore += 8;
           reasons.push(`Comfortably meets income requirement`);
         } else {
           totalScore += 5;
           reasons.push(`Meets minimum income requirement`);
         }
 
-        // 5. Credit history suitability (5 points max)
-        if (profile.credit_history === 'excellent' && 
-            card.card_category?.toLowerCase().includes('premium')) {
+        // 5. Age suitability (5 points max)
+        if (profile.age >= 25 && profile.age <= 50) {
           totalScore += 5;
-          reasons.push(`Premium card perfect for excellent credit history`);
-        } else if (profile.credit_history === 'building' && 
-                   card.card_category?.toLowerCase().includes('entry')) {
+          reasons.push(`Perfect age range for this card category`);
+        } else {
+          totalScore += 3;
+          reasons.push(`Meets age requirements for application`);
+        }
+
+        // 6. Credit score optimization (5 points max)
+        if (profile.creditScore >= 750) {
           totalScore += 5;
-          reasons.push(`Entry-level card ideal for building credit`);
+          reasons.push(`Excellent credit score - best rates and approval`);
+        } else if (profile.creditScore >= 700) {
+          totalScore += 4;
+          reasons.push(`Good credit score for favorable terms`);
+        } else {
+          totalScore += 2;
+          reasons.push(`Credit score meets minimum requirements`);
         }
 
         return {
