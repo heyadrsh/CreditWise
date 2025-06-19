@@ -1,0 +1,126 @@
+flowchart TD
+    subgraph "Supabase Cloud Infrastructure"
+        direction TB
+        SB[Supabase Backend<br/>PostgreSQL Database]
+        AUTH[Supabase Auth<br/>User Management]
+        API[Auto-generated APIs<br/>REST & GraphQL]
+        RT[Real-time Subscriptions<br/>Live Updates]
+    end
+    
+    subgraph "Database Schema"
+        direction TB
+        CC["credit_cards Table<br/>📊 Primary Data Store<br/>• id (UUID, PK)<br/>• name, issuer, network<br/>• fees, rewards, eligibility<br/>• perks, categories<br/>• created_at, updated_at"]
+        
+        IDX["Database Indexes<br/>🔍 Performance Optimization<br/>• issuer_idx<br/>• category_idx<br/>• income_idx<br/>• network_idx"]
+        
+        RLS["Row Level Security<br/>🔒 Access Control<br/>• Admin-only write access<br/>• Public read access<br/>• Authenticated user policies"]
+    end
+    
+    subgraph "Admin Interface Operations"
+        direction TB
+        LOGIN[Admin Login<br/>Authentication Check]
+        CRUD[CRUD Operations<br/>Create, Read, Update, Delete]
+        BULK[Bulk Operations<br/>Seed, Import, Export]
+        STATS[Statistics Dashboard<br/>Analytics & Reports]
+    end
+    
+    subgraph "Data Management Workflow"
+        direction TB
+        START[Admin Access] --> AUTH_CHECK{Authenticated?}
+        AUTH_CHECK -->|No| LOGIN_MODAL[Show Login Modal]
+        AUTH_CHECK -->|Yes| DASHBOARD[Admin Dashboard]
+        
+        LOGIN_MODAL --> AUTH_FLOW[Supabase Auth Flow]
+        AUTH_FLOW --> DASHBOARD
+        
+        DASHBOARD --> TABS{Select Operation}
+        TABS -->|View| VIEW_CARDS[Display All Cards<br/>Search & Filter]
+        TABS -->|Create| CREATE_FORM[Card Creation Form<br/>Validation & Submit]
+        TABS -->|Stats| ANALYTICS[Statistics View<br/>Charts & Metrics]
+        
+        VIEW_CARDS --> CARD_OPS{Card Actions}
+        CARD_OPS -->|Edit| EDIT_FORM[Edit Card Form]
+        CARD_OPS -->|Delete| DELETE_CONFIRM[Confirmation Dialog]
+        CARD_OPS -->|View Details| CARD_DETAIL[Card Details Modal]
+        
+        CREATE_FORM --> VALIDATE[Data Validation<br/>Required Fields Check]
+        EDIT_FORM --> VALIDATE
+        
+        VALIDATE -->|Valid| SUBMIT[Submit to Supabase]
+        VALIDATE -->|Invalid| ERROR[Show Validation Errors]
+        ERROR --> CREATE_FORM
+        
+        SUBMIT --> DB_UPDATE[Database Update]
+        DELETE_CONFIRM -->|Yes| DB_DELETE[Database Delete]
+        DELETE_CONFIRM -->|No| VIEW_CARDS
+        
+        DB_UPDATE --> SYNC[Auto-sync Refresh<br/>Real-time Update]
+        DB_DELETE --> SYNC
+        
+        SYNC --> VIEW_CARDS
+    end
+    
+    subgraph "Real-time Features"
+        direction TB
+        AUTO_SYNC["Auto-sync (3 seconds)<br/>🔄 Live Data Updates"]
+        MANUAL_SYNC["Manual Sync Button<br/>🔄 Force Refresh"]
+        STATUS["Sync Status Indicator<br/>🟢 Last sync timestamp"]
+    end
+    
+    subgraph "API Integration"
+        direction TB
+        GET[GET /credit_cards<br/>Fetch all cards]
+        POST[POST /credit_cards<br/>Create new card]
+        PUT[PUT /credit_cards/:id<br/>Update existing card]
+        DEL[DELETE /credit_cards/:id<br/>Remove card]
+        SEARCH[GET /search<br/>Filter & query cards]
+    end
+    
+    subgraph "Frontend Integration"
+        direction TB
+        REACT[React Components<br/>Admin Interface]
+        STATE[State Management<br/>Real-time Updates]
+        FORMS[Form Handling<br/>Validation & Submission]
+        ERROR_UI[Error Handling<br/>User Feedback]
+    end
+    
+    %% Connections between subgraphs
+    REACT --> API
+    API --> SB
+    AUTH --> LOGIN
+    CC --> VIEW_CARDS
+    AUTO_SYNC --> SYNC
+    MANUAL_SYNC --> SYNC
+    
+    %% Data Flow Arrows
+    SB -.->|Real-time| RT
+    RT -.->|Updates| STATE
+    API -.->|CRUD| CC
+    AUTH -.->|Security| RLS
+    
+    %% Error Flows
+    SUBMIT -.->|Network Error| RETRY[Retry Logic<br/>Exponential Backoff]
+    RETRY -.->|Success| DB_UPDATE
+    RETRY -.->|Failure| ERROR_UI
+    
+    DB_UPDATE -.->|Constraint Error| CONSTRAINT_ERROR[Database Constraint Error]
+    CONSTRAINT_ERROR -.->|Show Message| ERROR_UI
+    
+    %% Styling
+    classDef supabaseNode fill:#10b981,stroke:#059669,stroke-width:2px,color:#fff
+    classDef databaseNode fill:#3b82f6,stroke:#2563eb,stroke-width:2px,color:#fff
+    classDef adminNode fill:#8b5cf6,stroke:#7c3aed,stroke-width:2px,color:#fff
+    classDef processNode fill:#f59e0b,stroke:#d97706,stroke-width:2px,color:#fff
+    classDef errorNode fill:#ef4444,stroke:#dc2626,stroke-width:2px,color:#fff
+    classDef realtimeNode fill:#06b6d4,stroke:#0891b2,stroke-width:2px,color:#fff
+    classDef apiNode fill:#84cc16,stroke:#65a30d,stroke-width:2px,color:#fff
+    classDef frontendNode fill:#ec4899,stroke:#db2777,stroke-width:2px,color:#fff
+    
+    class SB,AUTH,API,RT supabaseNode
+    class CC,IDX,RLS databaseNode
+    class LOGIN,CRUD,BULK,STATS,DASHBOARD,VIEW_CARDS,CREATE_FORM,EDIT_FORM,ANALYTICS adminNode
+    class START,AUTH_CHECK,TABS,CARD_OPS,VALIDATE,SUBMIT,DB_UPDATE,DB_DELETE,SYNC processNode
+    class ERROR,DELETE_CONFIRM,RETRY,CONSTRAINT_ERROR,ERROR_UI errorNode
+    class AUTO_SYNC,MANUAL_SYNC,STATUS realtimeNode
+    class GET,POST,PUT,DEL,SEARCH apiNode
+    class REACT,STATE,FORMS frontendNode

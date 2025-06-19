@@ -56,21 +56,6 @@ ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
 
-# Large files and media (optional cleanup)
-*.png
-*.jpg
-*.jpeg
-*.gif
-*.svg
-*.mp4
-*.avi
-*.mov
-!public/*.png
-!public/*.jpg
-!public/*.jpeg
-!public/*.gif
-!public/*.svg
-!public/favicon.*
 
 # Documentation that might contain sensitive info
 *.md
