@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    
+    <!-- Primary Meta Tags -->
+    <title>CreditWise AI - Smart Credit Card Recommendations | AI-Powered Financial Guidance</title>
+    <meta name="title" content="CreditWise AI - Smart Credit Card Recommendations | AI-Powered Financial Guidance" />
+    <meta name="description" content="Discover the perfect credit card with CreditWise AI. Get personalized recommendations, compare rewards, calculate benefits, and make informed financial decisions with our intelligent platform." />
+    <meta name="keywords" content="credit cards, AI recommendations, financial tools, credit card comparison, rewards calculator, personal finance, fintech, India credit cards, smart banking" />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="English" />
+    <meta name="author" content="CreditWise AI" />
+    
+    <!-- Viewport and Mobile Optimization -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="CreditWise AI" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://creditwise-ai.vercel.app/" />
+    <meta property="og:title" content="CreditWise AI - Smart Credit Card Recommendations" />
+    <meta property="og:description" content="Discover the perfect credit card with AI-powered recommendations. Compare rewards, calculate benefits, and make informed financial decisions." />
+    <meta property="og:image" content="https://creditwise-ai.vercel.app/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="CreditWise AI" />
+    <meta property="og:locale" content="en_US" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://creditwise-ai.vercel.app/" />
+    <meta property="twitter:title" content="CreditWise AI - Smart Credit Card Recommendations" />
+    <meta property="twitter:description" content="Discover the perfect credit card with AI-powered recommendations. Compare rewards, calculate benefits, and make informed financial decisions." />
+    <meta property="twitter:image" content="https://creditwise-ai.vercel.app/og-image.png" />
+    
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#0071ce" />
+    <meta name="msapplication-TileColor" content="#0071ce" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://creditwise-ai.vercel.app/" />
+    
+    <!-- Preconnect for Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://yfctttajlqrnigqnryry.supabase.co" />
+    
+    <!-- DNS Prefetch -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="//fonts.gstatic.com" />
+    
+    <!-- Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;500;700;900&family=Noto+Sans:wght@400;500;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link 
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" 
+      rel="stylesheet" 
+    />
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "CreditWise AI",
+      "url": "https://creditwise-ai.vercel.app",
+      "description": "AI-powered credit card recommendation platform with intelligent analysis and personalized suggestions",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Web Browser",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "INR"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "CreditWise AI"
+      },
+      "provider": {
+        "@type": "Organization",
+        "name": "CreditWise AI",
+        "url": "https://creditwise-ai.vercel.app"
+      }
+    }
+    </script>
+    
+    <!-- Performance Optimization -->
+    <link rel="modulepreload" href="/src/main.tsx" />
+    
+    <!-- Security Headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="X-Frame-Options" content="DENY" />
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+    <meta name="referrer" content="origin-when-cross-origin" />
+    
+    <!-- Loading Styles -->
+    <style>
+      /* Critical CSS for immediate rendering */
+      * {
+        box-sizing: border-box;
+      }
+      
+      body {
+        margin: 0;
+        font-family: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background-color: #ffffff;
+        color: #0f172a;
+      }
+      
+      #root {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      
+      /* Loading spinner */
+      .loading-spinner {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 40px;
+        height: 40px;
+        border: 4px solid #e2e8f0;
+        border-top: 4px solid #0071ce;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        z-index: 9999;
+      }
+      
+      @keyframes spin {
+        0% { transform: translate(-50%, -50%) rotate(0deg); }
+        100% { transform: translate(-50%, -50%) rotate(360deg); }
+      }
+      
+      .loading-text {
+        position: fixed;
+        top: 60%;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #0071ce;
+        font-weight: 600;
+        z-index: 9999;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <!-- Loading state -->
+      <div class="loading-spinner"></div>
+      <div class="loading-text">Loading CreditWise AI...</div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
