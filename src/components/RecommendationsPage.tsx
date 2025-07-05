@@ -110,7 +110,7 @@ const CardDetailsModal = ({ card, isOpen, onClose, reasons, matchScore }: {
             </div>
 
             {/* Key Metrics - Dynamic Grid */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
               {[
                 { icon: 'percent', label: 'Reward Rate', value: `${card.reward_rate}%`, delay: '500' },
                 { icon: 'payments', label: 'Annual Fee', value: card.annual_fee === 0 ? 'Free' : `₹${card.annual_fee?.toLocaleString()}`, delay: '600' },
@@ -783,7 +783,7 @@ export default function RecommendationsPage({ userProfile, onNavigate, onCompare
               {/* Card Information */}
               <div className="p-6 space-y-4">
                 {/* Key Metrics */}
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="text-center p-3 bg-background rounded-lg border border-border">
                     <div className="text-xl font-bold text-text-primary">
                       {topRecommendation.card?.base_reward_rate || topRecommendation.card?.reward_rate || 0}%

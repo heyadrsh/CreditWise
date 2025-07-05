@@ -300,7 +300,7 @@ ${card.best_for?.map(use => `• ${use}`).join('\n') || '• General spending'}
         {/* Card Information - Compact */}
         <div className="p-3 space-y-2">
           {/* Key Metrics */}
-          <div className="grid grid-cols-3 gap-2 text-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
             <div className="text-center p-2 bg-gray-50 dark:bg-gray-800 rounded">
               <div className="font-semibold text-gray-900 dark:text-white">
                 {card.base_reward_rate || card.reward_rate || 0}%
