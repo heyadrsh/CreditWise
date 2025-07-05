@@ -18,19 +18,6 @@ declare module 'react-markdown' {
   export default ReactMarkdown;
 }
 
-// Minimal fallback for React in case the type resolution fails.
-declare module 'react' {
-  const React: any;
-  export default React;
-  export const useState: any;
-  export const useEffect: any;
-  export const useRef: any;
-  export const useContext: any;
-  export const createElement: any;
-  export const Component: any;
-  export const FC: any;
-}
-
 // Missing typings for remark-gfm
 
 declare module 'remark-gfm' {

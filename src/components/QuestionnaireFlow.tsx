@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { GoogleGenAI } from '@google/genai';
+import GenerativeAI from '@google/generative-ai';
 import { getAllCards, type CreditCard } from '../lib/creditCardApi';
 import { supabase } from '../lib/supabase';
 import ReactMarkdown from 'react-markdown';
@@ -26,7 +26,7 @@ interface ChatMessage {
 }
 
 // Initialize Gemini AI
-const ai = new GoogleGenAI({
+const ai = new GenerativeAI({
   apiKey: import.meta.env.VITE_GEMINI_API_KEY || '' // Get API key from environment variables
 });
 
