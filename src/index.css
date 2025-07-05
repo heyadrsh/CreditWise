@@ -24,6 +24,14 @@
     @apply font-times text-text-secondary leading-relaxed;
   }
 
+  /* Mobile-friendly defaults */
+  img {
+    @apply max-w-full h-auto;
+  }
+
+  table {
+    @apply w-full;
+  }
 }
 
 @layer utilities {
@@ -62,6 +70,10 @@
     @apply border-2 border-border hover:border-primary text-text-secondary hover:text-primary font-medium px-6 py-3 rounded-lg transition-all duration-200;
   }
 
+  /* Prevent horizontal scroll due to long words/URLs */
+  .break-words {
+    @apply break-words;
+  }
 }
 
 /* Times Internet Material Icons */
