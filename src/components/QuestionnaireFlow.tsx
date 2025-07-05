@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { GoogleGenAI } from '@google/genai';
 import { getAllCards, type CreditCard } from '../lib/creditCardApi';
 import { supabase } from '../lib/supabase';

@@ -1,17 +1,5 @@
 // Generic fallback type declarations for external modules lacking bundled types.
 
-// React is already typed via @types/react, but in case module resolution fails in certain tooling environments,
-// this fallback prevents "Cannot find module 'react'" errors during isolated type checks.
-declare module 'react' {
-  import * as React from 'react';
-  export = React;
-}
-
-declare module 'react-dom' {
-  import * as ReactDOM from 'react-dom';
-  export = ReactDOM;
-}
-
 // Google Generative AI packages currently ship without TypeScript typings.
 // These ambient declarations provide an "any" fallback so compilation succeeds.
 declare module '@google/genai' {
@@ -28,4 +16,24 @@ declare module '@google/generative-ai' {
 declare module 'react-markdown' {
   const ReactMarkdown: any;
   export default ReactMarkdown;
+}
+
+// Minimal fallback for React in case the type resolution fails.
+declare module 'react' {
+  const React: any;
+  export default React;
+  export const useState: any;
+  export const useEffect: any;
+  export const useRef: any;
+  export const useContext: any;
+  export const createElement: any;
+  export const Component: any;
+  export const FC: any;
+}
+
+// Missing typings for remark-gfm
+
+declare module 'remark-gfm' {
+  const remarkGfm: any;
+  export default remarkGfm;
 }
